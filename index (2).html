@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clases en vivo — Upfunnel</title>
+<meta name="description" content="Clases en vivo todos los sábados para emprendedores. Automatiza lo repetitivo con IA. Descarga gratis el material de la clase de Claude Skills.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --uf-bg:#080C14;
+  --uf-accent:#00E5FF;
+  --uf-text:#FFFFFF;
+  --uf-muted:#94A3B8;
+  --uf-font:'Inter',sans-serif;
+  --bounce:cubic-bezier(.34,1.56,.64,1);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--uf-bg);color:var(--uf-text);font-family:var(--uf-font);
+  font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* ---------- Parallax: capas de fondo ---------- */
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;will-change:transform}
+.bg-grid{
+  background-image:linear-gradient(rgba(148,163,184,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 90% 55% at 50% 0%,#000 35%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 55% at 50% 0%,#000 35%,transparent 100%);
+}
+.bg-orb{
+  top:-260px;left:50%;width:820px;height:820px;margin-left:-410px;position:fixed;
+  background:radial-gradient(circle,rgba(0,229,255,.13) 0%,rgba(0,229,255,0) 62%);
+  filter:blur(28px);
+}
+
+/* ---------- Barra de progreso ---------- */
+.progress{
+  position:fixed;top:0;left:0;height:2px;width:0;z-index:99;
+  background:var(--uf-accent);box-shadow:0 0 12px rgba(0,229,255,.7);
+  transition:width .08s linear;
+}
+
+.wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 24px}
+.uf-border{border:1px solid rgba(148,163,184,.25)}
+.uf-glow{box-shadow:0 0 24px rgba(0,229,255,.35)}
+
+/* ---------- Animación entrada / salida ---------- */
+.reveal{opacity:0;transform:translateY(34px) scale(.985);transition:opacity .5s var(--ease),transform .7s var(--bounce)}
+.reveal.in{opacity:1;transform:none}
+.reveal.out{opacity:0;transform:translateY(-18px) scale(.99);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.d1{transition-delay:.06s}.d2{transition-delay:.12s}.d3{transition-delay:.18s}.d4{transition-delay:.24s}
+
+/* ---------- Header ---------- */
+header{padding:36px 0 0}
+header img{width:170px;height:auto;display:block;transition:transform .4s var(--bounce)}
+header img:hover{transform:scale(1.04)}
+
+/* ---------- Hero ---------- */
+.hero{padding:70px 0 34px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--uf-accent);margin-bottom:24px;
+  padding:7px 15px;border:1px solid rgba(0,229,255,.4);border-radius:999px;
+}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--uf-accent);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,229,255,.6)}50%{opacity:.55;box-shadow:0 0 0 7px rgba(0,229,255,0)}}
+h1{font-size:clamp(34px,5.7vw,60px);font-weight:800;line-height:1.07;letter-spacing:-.022em;max-width:17ch}
+h1 .accent{color:var(--uf-accent)}
+.pitch{margin-top:30px;max-width:56ch}
+.pitch p{font-size:17.5px;color:var(--uf-muted);margin-bottom:12px}
+.pitch p.hit{color:var(--uf-text);font-weight:600}
+.bullets{list-style:none;margin:34px 0 0;display:grid;gap:14px}
+.bullets li{display:flex;gap:12px;align-items:flex-start;font-size:16px}
+.bullets .ic{font-size:17px;line-height:1.5}
+
+/* ---------- Cadena de curiosidad ---------- */
+.chain{
+  display:inline-flex;align-items:center;gap:10px;margin:44px 0 0;
+  color:var(--uf-accent);text-decoration:none;font-weight:700;font-size:15.5px;
+  border-bottom:1px solid rgba(0,229,255,.35);padding-bottom:5px;
+  transition:gap .25s var(--bounce),border-color .25s var(--ease);
+}
+.chain:hover{gap:16px;border-color:var(--uf-accent)}
+.chain span{animation:nudge 2.4s infinite}
+@keyframes nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+/* ---------- Material ---------- */
+.material{
+  margin:64px 0;padding:40px;border-radius:16px;
+  background:linear-gradient(180deg,rgba(0,229,255,.05),rgba(8,12,20,0));
+  transition:transform .4s var(--ease),border-color .4s var(--ease);
+}
+.material:hover{transform:translateY(-4px);border-color:rgba(0,229,255,.4)}
+.material h2{font-size:25px;font-weight:800;letter-spacing:-.015em}
+.material p{color:var(--uf-muted);margin-top:14px;max-width:60ch;font-size:15.5px}
+.cta{
+  display:inline-flex;align-items:center;gap:10px;margin-top:28px;
+  background:var(--uf-accent);color:var(--uf-bg);font-weight:700;font-size:16px;
+  text-decoration:none;padding:15px 28px;border-radius:10px;
+  transition:transform .3s var(--bounce),box-shadow .3s var(--ease);
+}
+.cta:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 0 38px rgba(0,229,255,.55)}
+.cta:active{transform:translateY(-1px) scale(.99)}
+.cta-ghost{
+  display:inline-flex;align-items:center;gap:10px;background:transparent;color:var(--uf-accent);
+  border:1px solid rgba(0,229,255,.45);font-weight:700;font-size:15px;text-decoration:none;
+  padding:14px 26px;border-radius:10px;transition:background .25s var(--ease),transform .3s var(--bounce);
+}
+.cta-ghost:hover{background:rgba(0,229,255,.09);transform:translateY(-2px)}
+.microcopy{color:var(--uf-muted);font-size:13px;margin-top:14px}
+
+/* ---------- Secciones ---------- */
+.section-head{margin:84px 0 8px}
+.section-head h2{font-size:29px;font-weight:800;letter-spacing:-.015em}
+.section-head p{color:var(--uf-muted);margin-top:10px;font-size:15.5px;max-width:60ch}
+
+.block-label{
+  display:flex;align-items:center;gap:14px;margin:46px 0 18px;font-size:12px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--uf-accent);
+}
+.block-label::after{content:"";flex:1;height:1px;background:rgba(0,229,255,.25)}
+
+.class{
+  display:flex;gap:22px;padding:22px 16px;margin:0 -16px;border-radius:10px;
+  border-bottom:1px solid rgba(148,163,184,.15);
+  transition:background .3s var(--ease),transform .3s var(--ease);
+}
+.class:hover{background:rgba(0,229,255,.045);transform:translateX(7px)}
+.date{flex:0 0 92px;font-weight:700;font-size:14px;color:var(--uf-accent);padding-top:2px}
+.class h3{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.class p{color:var(--uf-muted);font-size:14.5px;margin-top:6px}
+.tag{
+  display:inline-block;margin-top:10px;font-size:11px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--uf-muted);border:1px solid rgba(148,163,184,.3);
+  border-radius:4px;padding:3px 8px;
+}
+
+.bank{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:20px}
+.bank div{padding:22px;border-radius:12px;transition:transform .35s var(--bounce),border-color .35s var(--ease)}
+.bank div:hover{transform:translateY(-6px);border-color:rgba(0,229,255,.4)}
+.bank h4{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--uf-accent);margin-bottom:14px}
+.bank ul{list-style:none;display:grid;gap:9px}
+.bank li{font-size:14px;color:var(--uf-muted);padding-left:16px;position:relative}
+.bank li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:50%;background:var(--uf-accent);opacity:.65}
+
+/* ---------- Testimonios ---------- */
+.testis{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:24px}
+.testi{
+  padding:26px;border-radius:12px;background:rgba(148,163,184,.04);
+  transition:transform .35s var(--bounce),border-color .35s var(--ease);
+}
+.testi:hover{transform:translateY(-6px);border-color:rgba(0,229,255,.4)}
+.testi p{font-size:15px;line-height:1.65}
+.testi .who{margin-top:18px;padding-top:14px;border-top:1px solid rgba(148,163,184,.18);font-size:13px;color:var(--uf-muted)}
+.testi .who strong{color:var(--uf-text);font-weight:600;display:block}
+
+/* ---------- FAQ ---------- */
+.faq{margin-top:22px}
+details{border-bottom:1px solid rgba(148,163,184,.15);padding:20px 0}
+summary{
+  cursor:pointer;list-style:none;font-weight:600;font-size:16.5px;
+  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  transition:color .2s var(--ease),padding-left .3s var(--bounce);
+}
+summary::-webkit-details-marker{display:none}
+summary:hover{color:var(--uf-accent);padding-left:6px}
+summary::after{content:"+";color:var(--uf-accent);font-size:22px;font-weight:400;flex-shrink:0;transition:transform .35s var(--bounce);line-height:1}
+details[open] summary::after{transform:rotate(135deg)}
+details p{color:var(--uf-muted);font-size:15px;margin-top:14px;max-width:64ch;animation:fadeDown .4s var(--ease)}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+
+.pendiente{
+  background:rgba(0,229,255,.14);color:var(--uf-accent);border:1px dashed rgba(0,229,255,.5);
+  border-radius:4px;padding:1px 7px;font-weight:700;font-size:13px;
+}
+
+/* ---------- Comunidad ---------- */
+.join{
+  margin:76px 0 0;padding:48px 38px;border-radius:16px;text-align:center;
+  background:radial-gradient(ellipse 70% 100% at 50% 0%,rgba(0,229,255,.1),rgba(8,12,20,0));
+}
+.join h2{font-size:clamp(24px,3.5vw,33px);font-weight:800;letter-spacing:-.018em;max-width:22ch;margin:0 auto}
+.join .sub{margin:16px auto 0;max-width:56ch;color:var(--uf-muted);font-size:16px}
+.join .bullets{max-width:440px;margin:32px auto 0;text-align:left}
+.share{margin-top:40px;padding-top:28px;border-top:1px solid rgba(148,163,184,.18)}
+.share p{color:var(--uf-muted);font-size:14.5px;max-width:52ch;margin:0 auto 20px}
+.share strong{color:var(--uf-text);font-weight:600}
+.copied{color:var(--uf-accent);font-size:13px;margin-top:12px;min-height:18px}
+
+
+/* ---------- Modal del formulario ---------- */
+.modal{
+  position:fixed;inset:0;z-index:200;display:none;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(4,6,10,.82);backdrop-filter:blur(6px);
+  opacity:0;transition:opacity .3s var(--ease);
+}
+.modal.abierto{display:flex}
+.modal.visible{opacity:1}
+.modal-box{
+  background:var(--uf-bg);border:1px solid rgba(0,229,255,.3);border-radius:16px;
+  padding:36px;max-width:460px;width:100%;position:relative;
+  box-shadow:0 0 60px rgba(0,229,255,.18);
+  transform:translateY(24px) scale(.96);transition:transform .45s var(--bounce);
+  max-height:92vh;overflow-y:auto;
+}
+.modal.visible .modal-box{transform:none}
+.modal-box h3{font-size:23px;font-weight:800;letter-spacing:-.015em;max-width:18ch}
+.modal-box .lead{color:var(--uf-muted);font-size:14.5px;margin-top:10px}
+.cerrar{
+  position:absolute;top:16px;right:16px;background:none;border:0;cursor:pointer;
+  color:var(--uf-muted);font-size:26px;line-height:1;padding:4px 8px;border-radius:6px;
+  transition:color .2s var(--ease),transform .3s var(--bounce);
+}
+.cerrar:hover{color:var(--uf-accent);transform:rotate(90deg)}
+.campo{margin-top:20px}
+.campo label{display:block;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--uf-muted);margin-bottom:8px}
+.campo input{
+  width:100%;background:rgba(148,163,184,.06);color:var(--uf-text);
+  border:1px solid rgba(148,163,184,.28);border-radius:9px;
+  padding:13px 14px;font-family:var(--uf-font);font-size:15px;
+  transition:border-color .25s var(--ease),box-shadow .25s var(--ease);
+}
+.campo input::placeholder{color:rgba(148,163,184,.55)}
+.campo input:focus{outline:none;border-color:var(--uf-accent);box-shadow:0 0 0 3px rgba(0,229,255,.16)}
+.campo input.malo{border-color:#f87171;box-shadow:0 0 0 3px rgba(248,113,113,.14)}
+.error-campo{color:#f87171;font-size:12.5px;margin-top:6px;display:none}
+.error-campo.ver{display:block;animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.trampa{position:absolute;left:-9999px;opacity:0;pointer-events:none;height:0}
+.btn-enviar{
+  width:100%;margin-top:26px;background:var(--uf-accent);color:var(--uf-bg);
+  border:0;border-radius:10px;padding:15px;font-family:var(--uf-font);
+  font-weight:700;font-size:16px;cursor:pointer;
+  transition:transform .3s var(--bounce),box-shadow .3s var(--ease),opacity .2s;
+}
+.btn-enviar:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 34px rgba(0,229,255,.5)}
+.btn-enviar:disabled{opacity:.55;cursor:wait}
+.nota{color:var(--uf-muted);font-size:12.5px;margin-top:14px;text-align:center}
+.exito{text-align:center;padding:16px 0}
+.exito .tick{
+  width:60px;height:60px;border-radius:50%;margin:0 auto 20px;
+  border:2px solid var(--uf-accent);color:var(--uf-accent);font-size:29px;
+  display:flex;align-items:center;justify-content:center;
+  animation:pop .5s var(--bounce);
+}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.exito h3{margin:0 auto}
+.error-global{
+  display:none;margin-top:18px;padding:12px 14px;border-radius:9px;
+  background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.35);
+  color:#fca5a5;font-size:13.5px;
+}
+.error-global.ver{display:block}
+
+/* ---------- Footer ---------- */
+footer{margin:88px 0 64px;padding-top:40px;border-top:1px solid rgba(148,163,184,.2)}
+footer h3{font-size:20px;font-weight:800}
+footer p{color:var(--uf-muted);font-size:15px;margin-top:12px;max-width:58ch}
+.sig{margin-top:28px;font-size:13px;color:var(--uf-muted)}
+.sig strong{color:var(--uf-text)}
+
+@media(max-width:640px){
+  .class{flex-direction:column;gap:8px}
+  .class:hover{transform:none}
+  .date{flex:none}
+  .material,.join{padding:28px 22px}
+}
+/* Accesibilidad: respeta a quien pide menos movimiento */
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1!important;transform:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="bg-layer bg-grid" id="pxGrid"></div>
+<div class="bg-layer bg-orb" id="pxOrb"></div>
+
+<div class="wrap">
+
+  <header class="reveal">
+    <img src="logo-upfunnel.png" alt="UpFunnel">
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <span class="eyebrow reveal"><span class="dot"></span>Clases en vivo · Sábados 8 p.m. Colombia</span>
+    <h1 class="reveal d1">Deja de hacer a mano lo que una IA bien configurada ya <span class="accent">resuelve</span></h1>
+
+    <div class="pitch reveal d2">
+      <p>Abres la herramienta. Escribes algo. Te devuelve una respuesta genérica.</p>
+      <p>Y terminas haciendo la tarea a mano, igual que ayer.</p>
+      <p class="hit">No es que seas malo para esto. Es que nadie te enseñó a darle contexto.</p>
+      <p>Todos empezamos ahí. Acá nadie juzga a nadie.</p>
+    </div>
+
+    <ul class="bullets reveal d3">
+      <li><span class="ic">🎯</span><span>13 sábados de clases en vivo, arrancando el 18 de julio.</span></li>
+      <li><span class="ic">🚀</span><span>Cada clase sale con algo aplicable ese mismo día, no con apuntes.</span></li>
+      <li><span class="ic">👀</span><span>La guía de Claude Skills son 9 páginas con ejercicios, y es gratis.</span></li>
+    </ul>
+
+    <a class="chain reveal d4" href="#material">Antes de creerme, mira lo que te llevas <span>▾</span></a>
+  </section>
+
+  <!-- ================= MATERIAL (PRUEBA) ================= -->
+  <section class="material uf-border reveal" id="material">
+    <h2>La guía de Claude Skills, gratis a tu correo</h2>
+    <p>La guía de 9 páginas que se entregó a la comunidad para la charla de Claude Skills: qué es un skill, los 3 niveles con los que Claude los carga, la fórmula de una descripción que sí se activa, las 5 reglas técnicas que no se pueden romper y un glosario exprés.</p>
+    <p>Trae campos rellenables, checklist y ejercicios — no es un folleto de dos carillas. No te la cuento: te la mando entera, sin cobrarte nada y sin pedirte que primero te ganes la confianza.</p>
+    <p>Te pido tu correo por una sola razón, y te la digo de frente: es el único modo de mandártela y de avisarte cuando haya clase. No hay segundo paso, ni versión premium, ni nada que comprar después.</p>
+    <a class="cta uf-glow" href="#" id="btnGuia">Sí, quiero que me llegue la guía</a>
+    <p class="microcopy">Gratis. Llega a tu correo en menos de un minuto, sin más pasos.</p>
+  </section>
+
+  <a class="chain reveal" href="#temario">Ya sabes qué te llevas. Ahora, qué sigue ▾</a>
+
+  <!-- ================= TEMARIO ================= -->
+  <div class="section-head reveal" id="temario">
+    <h2>El temario</h2>
+    <p>Tres bloques, en este orden: primero automatizas lo repetitivo, después reduces tu esfuerzo, y de ahí potencias tus resultados.</p>
+  </div>
+
+  <div class="block-label reveal">Bloque 1 · Automatiza — confirmado</div>
+
+  <div class="class reveal">
+    <div class="date">18 JUL</div>
+    <div>
+      <h3>Las tareas que dejas de hacer a mano cuando la IA ya sabe cómo trabajas</h3>
+      <p>Tres herramientas reales funcionando en vivo, resolviendo tareas que hoy haces a mano. Sin diapositivas bonitas.</p>
+      <span class="tag">Demo en vivo</span>
+    </div>
+  </div>
+
+  <div class="class reveal">
+    <div class="date">25 JUL</div>
+    <div>
+      <h3>La IA no es bruta, es que no sabe nada de ti</h3>
+      <p>Por qué te da respuestas genéricas — y no es culpa del prompt. Sales con el contexto de tu negocio armado y la misma pregunta te da otra respuesta.</p>
+      <span class="tag">Sales con tu contexto</span>
+    </div>
+  </div>
+
+  <div class="class reveal">
+    <div class="date">1 AGO</div>
+    <div>
+      <h3>Traé tu tarea repetitiva: la resolvemos en vivo</h3>
+      <p>Clínica abierta. Traes una tarea que te quita tiempo cada semana y salimos con ella resuelta o encaminada.</p>
+      <span class="tag">Clínica abierta</span>
+    </div>
+  </div>
+
+  <div class="class reveal">
+    <div class="date">8 AGO</div>
+    <div>
+      <h3>De la idea a tu primer skill funcionando</h3>
+      <p>Continuación práctica de la clase de Claude Skills. No terminas con apuntes: terminas con una skill tuya corriendo.</p>
+      <span class="tag">Construcción guiada</span>
+    </div>
+  </div>
+
+  <div class="block-label reveal">Bloques 2 y 3 · Se definen con lo que salga en la clínica</div>
+
+  <div class="bank">
+    <div class="uf-border reveal">
+      <h4>Reduce tu esfuerzo</h4>
+      <ul>
+        <li>Que la IA escriba sonando a ti</li>
+        <li>Decks listos sin abrir PowerPoint</li>
+        <li>De un video a una semana de contenido</li>
+        <li>Vender por WhatsApp sin sonar a robot</li>
+      </ul>
+    </div>
+    <div class="uf-border reveal d1">
+      <h4>Potencia tus resultados</h4>
+      <ul>
+        <li>Cobrar por lo que construyes</li>
+        <li>Un sistema de contenido que no te quema</li>
+        <li>Errores caros: lo que no hay que hacer</li>
+        <li>Tu caso, en vivo, de cierre de trimestre</li>
+      </ul>
+    </div>
+  </div>
+
+  <a class="chain reveal" href="#testimonios">No me creas a mí. Míralos a ellos ▾</a>
+
+  <!-- ================= TESTIMONIOS ================= -->
+  <div class="section-head reveal" id="testimonios">
+    <h2>Lo que dicen los que ya estuvieron</h2>
+    <p>Gente de la comunidad que ya está construyendo lo suyo.</p>
+  </div>
+
+  <div class="testis">
+    <div class="testi uf-border reveal">
+      <p>Lo que busca son <em>"herramientas prácticas y excelentes en el trabajo"</em> — no teoría suelta.</p>
+      <div class="who"><strong>Edgar Lezama</strong>México</div>
+    </div>
+    <div class="testi uf-border reveal d1">
+      <p>Aprendió el proceso <em>"desde la parte cero"</em> y hoy lo maneja él solo, sin depender de nadie más.</p>
+      <div class="who"><strong>Iván Grandet</strong>Comunidad Upfunnel</div>
+    </div>
+  </div>
+
+  <a class="chain reveal" href="#faq">¿Y las dudas de siempre? ▾</a>
+
+  <!-- ================= FAQ ================= -->
+  <div class="section-head reveal" id="faq">
+    <h2>Preguntas frecuentes</h2>
+    <p>Si algo no está acá, escribes al interno y responde Gabriel — no un bot ni un equipo de soporte.</p>
+  </div>
+
+  <div class="faq reveal">
+    <details>
+      <summary>Nunca he usado IA para nada serio, ¿voy muy tarde?</summary>
+      <p>No. La clase del 18 de julio arranca desde cero y no asume que hayas visto nada anterior. Es la puerta de entrada, y por diseño se sostiene sola: no vas a llegar a un salón donde todos ya saben algo que tú no.</p>
+    </details>
+    <details>
+      <summary>¿Necesito saber programar?</summary>
+      <p>No. Las herramientas que vas a ver se construyen sin código. Si sabes escribir instrucciones claras en español, tienes lo que se necesita.</p>
+    </details>
+    <details>
+      <summary>¿A qué hora son las clases y dónde?</summary>
+      <p>Sábados a las 8:00 p.m. hora Colombia, por Google Meet. El enlace se comparte en el grupo de WhatsApp el mismo día — no tienes que registrarte en ningún lado ni instalar nada.</p>
+    </details>
+    <details>
+      <summary>Si es gratis, ¿por qué me piden el correo?</summary>
+      <p>Porque es el único modo de mandarte la guía y de avisarte cuando haya clase. Eso es todo lo que hago con él: no lo vendo, no lo paso a nadie, y no vas a entrar a una secuencia de doce correos vendiéndote algo. Si te cansa, te das de baja y ya.</p>
+    </details>
+    <details>
+      <summary>¿Cuánto cuestan?</summary>
+      <p>Nada. Son gratis para la comunidad. Entras al grupo de WhatsApp y ya estás adentro — no hay cuota, no hay plan premium, no hay nivel escondido.</p>
+    </details>
+    <details>
+      <summary>¿Se graban? No siempre puedo el sábado</summary>
+      <p>No siempre quedan grabadas. Te lo digo de frente para que no cuentes con eso: la clase que te pierdes, en la mayoría de los casos, se perdió. Por eso tu asistencia en vivo importa — aunque no es obligatoria y nadie te va a pasar lista.</p>
+    </details>
+    <details>
+      <summary>El temario solo tiene 4 clases con fecha, ¿y las otras?</summary>
+      <p>A propósito. El 1 de agosto hacemos una clínica abierta donde traes tu tarea repetitiva, y de ahí salen los temas de los bloques 2 y 3. Prefiero programar con lo que ustedes necesitan que adivinar en julio lo que va a servir en septiembre.</p>
+    </details>
+    <details>
+      <summary>¿Tengo que ir a todas?</summary>
+      <p>No. Cada clase se sostiene sola y sale con algo aplicable ese mismo día. Los bloques tienen orden porque se construyen uno sobre otro, pero si te pierdes una no quedas afuera de la siguiente.</p>
+    </details>
+    <details>
+      <summary>¿Tienes preguntas sobre Gabriel Aristizábal o Upfunnel?</summary>
+      <p>Hablemos por WhatsApp. Me escribes directo y respondo yo — no un bot ni un equipo de soporte. Si tu duda le sirve a más gente, la llevo a la clase del sábado.</p>
+      <p style="margin-top:18px"><a class="cta-ghost" href="https://wa.link/k1icm7">↗ Escribirle a Gabriel por WhatsApp</a></p>
+    </details>
+  </div>
+
+  <a class="chain reveal" href="#comunidad">Listo. ¿Cómo entro? ▾</a>
+
+  <!-- ================= COMUNIDAD ================= -->
+  <section class="join uf-border reveal" id="comunidad">
+    <h2>Súmate a la comunidad y automatiza lo que hoy haces a mano</h2>
+    <p class="sub">Somos emprendedores que construimos herramientas con IA y las compartimos funcionando. Si llegaste acá porque alguien te pasó el material, esta es la puerta de entrada.</p>
+    <ul class="bullets">
+      <li><span class="ic">🎯</span><span>Clases en vivo gratis, sábados 8 p.m. Colombia, desde el 18 de julio.</span></li>
+      <li><span class="ic">🚀</span><span>Las herramientas se comparten funcionando, no en teoría.</span></li>
+      <li><span class="ic">👀</span><span>Si necesitas acompañamiento en algo puntual, escribes al interno y responde Gabriel.</span></li>
+    </ul>
+
+    <a class="cta uf-glow" href="https://chat.whatsapp.com/GaH7I3tUJtiHYAP8nvSEfh" style="margin-top:32px">Sí, quiero unirme a la comunidad</a>
+    <p class="microcopy">Entras gratis por WhatsApp. Si algo no te sirve, te sales sin dar explicaciones.</p>
+
+    <div class="share">
+      <p><strong>¿Conoces a alguien que esté perdiendo horas en tareas repetitivas?</strong> Pásale esta página. La guía le llega gratis y las clases también — que lo revise y decida por su cuenta.</p>
+      <a class="cta-ghost" href="#" id="shareBtn">↗ Copiar enlace para compartir</a>
+      <p class="copied" id="copied"></p>
+    </div>
+  </section>
+
+  <footer class="reveal">
+    <h3>Si necesitas acompañamiento en algo puntual, escríbeme al interno</h3>
+    <p>Estoy activo en el grupo y respondo yo. Este proyecto no se trata de mí: se trata de que puedas llevar tu emprendimiento o tu negocio al siguiente nivel.</p>
+    <p class="sig"><strong>Gabriel Aristizábal</strong> — Upfunnel<br>Automatiza, reduce tu esfuerzo y potencia tus resultados.</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- Entrada y salida con IntersectionObserver ---- */
+  if(!reduce && 'IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('in');
+          e.target.classList.remove('out');
+        } else if(e.boundingClientRect.top < 0){
+          /* salió por arriba: animación de salida */
+          e.target.classList.remove('in');
+          e.target.classList.add('out');
+        }
+      });
+    }, {threshold:.12, rootMargin:'0px 0px -8% 0px'});
+    document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* ---- Parallax + barra de progreso ---- */
+  var grid = document.getElementById('pxGrid'),
+      orb  = document.getElementById('pxOrb'),
+      bar  = document.getElementById('progress'),
+      ticking = false;
+
+  function onScroll(){
+    var y = window.scrollY,
+        h = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (h > 0 ? (y/h)*100 : 0) + '%';
+    if(!reduce){
+      grid.style.transform = 'translateY(' + (y * .18) + 'px)';
+      orb.style.transform  = 'translateY(' + (y * .34) + 'px)';
+    }
+    ticking = false;
+  }
+  window.addEventListener('scroll', function(){
+    if(!ticking){ window.requestAnimationFrame(onScroll); ticking = true; }
+  }, {passive:true});
+  onScroll();
+
+  /* ---- Copiar enlace para compartir ---- */
+  document.getElementById('shareBtn').addEventListener('click', function(e){
+    e.preventDefault();
+    var msg = document.getElementById('copied');
+    navigator.clipboard.writeText(window.location.href).then(function(){
+      msg.textContent = '✓ Enlace copiado. Pásaselo a quien le sirva.';
+    }).catch(function(){
+      msg.textContent = 'Copia el enlace desde la barra del navegador.';
+    });
+  });
+})();
+
+/* ================= Formulario de la guía ================= */
+(function(){
+  var URL_WEBHOOK = 'https://xn8nx.upfunnel.click/webhook/guia-skills';
+
+  var modal   = document.getElementById('modal'),
+      form    = document.getElementById('formGuia'),
+      btn     = document.getElementById('btnEnviar'),
+      errGlob = document.getElementById('errorGlobal');
+
+  function abrir(e){
+    if(e) e.preventDefault();
+    modal.classList.add('abierto');
+    requestAnimationFrame(function(){ modal.classList.add('visible'); });
+    document.body.style.overflow='hidden';
+    setTimeout(function(){ document.getElementById('nombre').focus(); }, 300);
+  }
+  function cerrar(){
+    modal.classList.remove('visible');
+    setTimeout(function(){ modal.classList.remove('abierto'); document.body.style.overflow=''; }, 300);
+  }
+
+  document.getElementById('btnGuia').addEventListener('click', abrir);
+  document.getElementById('cerrarModal').addEventListener('click', cerrar);
+  modal.addEventListener('click', function(e){ if(e.target === modal) cerrar(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && modal.classList.contains('abierto')) cerrar(); });
+
+  function marcar(id, errId, ok){
+    var input = document.getElementById(id), err = document.getElementById(errId);
+    input.classList.toggle('malo', !ok);
+    err.classList.toggle('ver', !ok);
+    return ok;
+  }
+
+  function validar(){
+    var nombre   = document.getElementById('nombre').value.trim(),
+        whatsapp = document.getElementById('whatsapp').value.replace(/\D/g,''),
+        correo   = document.getElementById('correo').value.trim();
+
+    var okNombre   = marcar('nombre','errNombre', nombre.length > 1);
+    var okWhatsapp = marcar('whatsapp','errWhatsapp', whatsapp.length >= 7 && whatsapp.length <= 15);
+    var okCorreo   = marcar('correo','errCorreo', /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(correo));
+
+    return okNombre && okWhatsapp && okCorreo;
+  }
+
+  /* Valida al salir del campo, no mientras escribe: molesta menos */
+  ['nombre','whatsapp','correo'].forEach(function(id){
+    document.getElementById(id).addEventListener('blur', validar);
+  });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    errGlob.classList.remove('ver');
+    if(!validar()) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando…';
+
+    fetch(URL_WEBHOOK, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        nombre:   document.getElementById('nombre').value.trim(),
+        whatsapp: document.getElementById('whatsapp').value.trim(),
+        correo:   document.getElementById('correo').value.trim(),
+        web:      document.getElementById('web').value
+      })
+    })
+    .then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+    .then(function(res){
+      if(res.ok && res.d.ok){
+        document.getElementById('vistaForm').style.display='none';
+        document.getElementById('vistaExito').style.display='block';
+      } else {
+        throw new Error(res.d.mensaje || 'No se pudo enviar.');
+      }
+    })
+    .catch(function(err){
+      errGlob.textContent = err.message + ' Si sigue fallando, escríbeme por WhatsApp y te la mando yo.';
+      errGlob.classList.add('ver');
+      btn.disabled = false;
+      btn.textContent = 'Enviarme la guía';
+    });
+  });
+})();
+
+</script>
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+  <div class="modal-box">
+    <button class="cerrar" id="cerrarModal" aria-label="Cerrar">&times;</button>
+
+    <div id="vistaForm">
+      <h3 id="modalTitulo">¿A qué correo te mando la guía?</h3>
+      <p class="lead">Son 9 páginas con ejercicios. Llega en menos de un minuto y no cuesta nada.</p>
+
+      <form id="formGuia" novalidate>
+        <div class="campo">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" autocomplete="given-name" required>
+          <p class="error-campo" id="errNombre">Escribe tu nombre.</p>
+        </div>
+
+        <div class="campo">
+          <label for="whatsapp">WhatsApp</label>
+          <input type="tel" id="whatsapp" name="whatsapp" placeholder="+57 300 000 0000" autocomplete="tel" required>
+          <p class="error-campo" id="errWhatsapp">Revisa el número, con indicativo del país.</p>
+        </div>
+
+        <div class="campo">
+          <label for="correo">Correo</label>
+          <input type="email" id="correo" name="correo" placeholder="tu@correo.com" autocomplete="email" required>
+          <p class="error-campo" id="errCorreo">Ese correo no tiene un formato válido.</p>
+        </div>
+
+        <!-- Trampa para bots: invisible para una persona -->
+        <div class="trampa" aria-hidden="true">
+          <label for="web">No llenar</label>
+          <input type="text" id="web" name="web" tabindex="-1" autocomplete="off">
+        </div>
+
+        <button type="submit" class="btn-enviar" id="btnEnviar">Enviarme la guía</button>
+        <div class="error-global" id="errorGlobal"></div>
+        <p class="nota">Tu correo es solo para mandarte la guía y avisarte de las clases. Nada más.</p>
+      </form>
+    </div>
+
+    <div class="exito" id="vistaExito" style="display:none">
+      <div class="tick">✓</div>
+      <h3>Listo, revisa tu correo</h3>
+      <p class="lead">La guía ya va en camino. Si no llega en dos minutos, mírala en spam.</p>
+      <a class="cta uf-glow" href="https://chat.whatsapp.com/GaH7I3tUJtiHYAP8nvSEfh" style="margin-top:24px">Entrar a la comunidad</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
