@@ -1,0 +1,274 @@
+{
+  "name": "Upfunnel — Entrega guía Claude Skills (webhook)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "guia-skills",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "https://recursos.upfunnel.click",
+          "ignoreBots": true,
+          "rawBody": false
+        }
+      },
+      "id": "webhook",
+      "name": "Webhook — form de la página",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -500,
+        300
+      ],
+      "webhookId": "upfunnel-guia-skills"
+    },
+    {
+      "parameters": {
+        "jsCode": "// El navegador ya valida, pero eso se salta con un curl.\n// Esta es la validación real: nada de lo de abajo confía en el cliente.\n\nconst salida = [];\n\nfor (const item of $input.all()) {\n  const b = item.json.body ?? item.json;\n\n  const nombre   = String(b.nombre   ?? '').trim().slice(0, 80);\n  const whatsapp = String(b.whatsapp ?? '').trim();\n  const correo   = String(b.correo   ?? '').trim().toLowerCase();\n  const trampa   = String(b.web      ?? '').trim(); // honeypot: invisible para humanos\n\n  // Formato de correo\n  const formatoOk = /^[^\\s@]+@[^\\s@]+\\.[a-z]{2,}$/i.test(correo);\n\n  // Dominios desechables\n  const desechables = ['mailinator.com','tempmail.com','10minutemail.com','guerrillamail.com','yopmail.com','trashmail.com','sharklasers.com'];\n  const dominio = correo.split('@')[1] || '';\n  const esDesechable = desechables.includes(dominio);\n\n  // WhatsApp normalizado a E.164 (7 a 15 dígitos)\n  const soloDigitos = whatsapp.replace(/\\D/g, '');\n  const whatsappOk = soloDigitos.length >= 7 && soloDigitos.length <= 15;\n\n  // Si el honeypot viene lleno, es un bot: se descarta en silencio\n  const esBot = trampa.length > 0;\n\n  const valido = Boolean(nombre) && formatoOk && !esDesechable && whatsappOk && !esBot;\n\n  let motivo = '';\n  if (esBot)             motivo = 'bot';\n  else if (!nombre)      motivo = 'Escribe tu nombre.';\n  else if (!formatoOk)   motivo = 'Ese correo no tiene un formato válido.';\n  else if (esDesechable) motivo = 'Usa un correo real: ahí es donde te llega la guía.';\n  else if (!whatsappOk)  motivo = 'Revisa el número de WhatsApp.';\n\n  salida.push({\n    json: {\n      nombre,\n      whatsapp: soloDigitos ? '+' + soloDigitos : '',\n      correo,\n      valido,\n      motivo,\n      fecha: new Date().toISOString(),\n      origen: 'pagina-clases-upfunnel'\n    }\n  });\n}\n\nreturn salida;"
+      },
+      "id": "validar",
+      "name": "Validar y normalizar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-valido",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-valido",
+      "name": "¿Datos válidos?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -60,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://recursos.upfunnel.click/material-claude-skills.pdf",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "guia"
+            }
+          }
+        }
+      },
+      "id": "descargar-pdf",
+      "name": "Traer la guía (PDF)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        180,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "gabriel@upfunnel.click",
+        "toEmail": "={{ $('Validar y normalizar').item.json.correo }}",
+        "subject": "=Tu guía de Claude Skills, {{ $('Validar y normalizar').item.json.nombre }}",
+        "html": "=<div style=\"font-family:Inter,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#0f172a;max-width:600px\">\n<p>Hola {{ $('Validar y normalizar').item.json.nombre }}, ¡qué bueno tenerte por acá!</p>\n\n<p>Acabas de pedir la guía, y ese ya es el paso que la mayoría no da: dejar de mirar la IA de lejos y sentarse a entender cómo se le dan instrucciones que sirvan. Yo también empecé ahí, explicándole lo mismo cada vez.</p>\n\n<p>Te la adjunto en este correo. Son 9 páginas: qué es un skill, los 3 niveles con los que Claude los carga, la fórmula de una descripción que sí se activa, las 5 reglas técnicas y un glosario.</p>\n\n<p>No es para leer y guardar. Trae campos rellenables y ejercicios: ábrela y complétala.</p>\n\n<p>👉🏻 Abre el PDF adjunto y completa el ejercicio de la página 5: la descripción de un skill que te gustaría tener.</p>\n\n<p>Las dudas se resuelven en vivo en la comunidad de WhatsApp, y ahí mismo aviso las clases de los sábados a las 8 p.m. hora Colombia:<br>\n<a href=\"https://chat.whatsapp.com/GaH7I3tUJtiHYAP8nvSEfh\" style=\"color:#0891b2;font-weight:600\">Entrar a la comunidad</a></p>\n\n<p>Si algo no te cuadra, responde este correo. Lo leo yo, no un bot.</p>\n\n<p>Un abrazo,<br><strong>Gabriel</strong> — Upfunnel<br>\n<span style=\"color:#64748b;font-size:13px\">Automatiza, reduce tu esfuerzo y potencia tus resultados.</span></p>\n</div>",
+        "options": {
+          "attachments": "guia",
+          "replyTo": "gabriel@upfunnel.click"
+        }
+      },
+      "id": "enviar-email",
+      "name": "Enviar guía por correo",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        400,
+        180
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "CONFIGURAR",
+          "name": "SMTP Upfunnel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "ID_DE_TU_GOOGLE_SHEET",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha": "={{ $('Validar y normalizar').item.json.fecha }}",
+            "Nombre": "={{ $('Validar y normalizar').item.json.nombre }}",
+            "WhatsApp": "={{ $('Validar y normalizar').item.json.whatsapp }}",
+            "Correo": "={{ $('Validar y normalizar').item.json.correo }}",
+            "Origen": "={{ $('Validar y normalizar').item.json.origen }}"
+          },
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "guardar-lead",
+      "name": "Guardar lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        620,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, mensaje: 'Listo. La guía va en camino a tu correo.' }) }}",
+        "options": {}
+      },
+      "id": "responder-ok",
+      "name": "Responder OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        840,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: false, mensaje: $json.motivo || 'Revisa los datos.' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "responder-error",
+      "name": "Responder error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        180,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook — form de la página": {
+      "main": [
+        [
+          {
+            "node": "Validar y normalizar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar y normalizar": {
+      "main": [
+        [
+          {
+            "node": "¿Datos válidos?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Datos válidos?": {
+      "main": [
+        [
+          {
+            "node": "Traer la guía (PDF)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traer la guía (PDF)": {
+      "main": [
+        [
+          {
+            "node": "Enviar guía por correo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar guía por correo": {
+      "main": [
+        [
+          {
+            "node": "Guardar lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar lead": {
+      "main": [
+        [
+          {
+            "node": "Responder OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "upfunnel"
+  },
+  "tags": [
+    {
+      "name": "upfunnel"
+    }
+  ]
+}
