@@ -165,17 +165,6 @@ h1 .accent{color:var(--uf-accent)}
   border-radius:4px;padding:3px 8px;
 }
 
-/* ---------- Recursos por clase ---------- */
-.recurso-card{
-  display:flex;gap:22px;padding:22px 16px;margin:0 -16px;border-radius:10px;
-  border-bottom:1px solid rgba(148,163,184,.15);
-  transition:background .3s var(--ease),transform .3s var(--ease);
-}
-.recurso-card:hover{background:rgba(0,229,255,.045);transform:translateX(7px)}
-.recurso-card h3{font-size:17px;font-weight:700;letter-spacing:-.01em}
-.recurso-card p{color:var(--uf-muted);font-size:14.5px;margin-top:6px}
-.recurso-card .date{flex:0 0 92px;font-weight:700;font-size:14px;color:var(--uf-accent);padding-top:2px}
-
 .bank{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:20px}
 .bank div{padding:22px;border-radius:12px;transition:transform .35s var(--bounce),border-color .35s var(--ease)}
 .bank div:hover{transform:translateY(-6px);border-color:rgba(0,229,255,.4)}
@@ -400,6 +389,7 @@ footer p{color:var(--uf-muted);font-size:15px;margin-top:12px;max-width:58ch}
       <h3>Las tareas que dejas de hacer a mano cuando la IA ya sabe cómo trabajas</h3>
       <p>Tres herramientas reales funcionando en vivo, resolviendo tareas que hoy haces a mano. Sin diapositivas bonitas.</p>
       <span class="tag">Demo en vivo</span>
+      <button class="cta-ghost btn-recurso" data-recurso="clase-2026-07-18" style="margin-top:14px;cursor:pointer;font-size:13px;padding:10px 18px">Recibir material de esta clase</button>
     </div>
   </div>
 
@@ -450,23 +440,6 @@ footer p{color:var(--uf-muted);font-size:15px;margin-top:12px;max-width:58ch}
         <li>Errores caros: lo que no hay que hacer</li>
         <li>Tu caso, en vivo, de cierre de trimestre</li>
       </ul>
-    </div>
-  </div>
-
-  <a class="chain reveal" href="#recursos">¿Te perdiste alguna? Agarrá el material ▾</a>
-
-  <!-- ================= RECURSOS POR CLASE ================= -->
-  <div class="section-head reveal" id="recursos">
-    <h2>Material de cada clase</h2>
-    <p>Si no pudiste estar en vivo, acá te llevas lo que entregamos ese día. Llega a tu correo igual que la guía.</p>
-  </div>
-
-  <div class="recurso-card reveal uf-border">
-    <div class="date">18 JUL</div>
-    <div>
-      <h3>Mastering AI Context</h3>
-      <p>El PDF que entregamos en la primera clase: cómo darle contexto real a la IA para que trabaje como si conociera tu negocio.</p>
-      <button class="cta-ghost btn-recurso" data-recurso="clase-2026-07-18" style="margin-top:14px;cursor:pointer">Recibir material de esta clase</button>
     </div>
   </div>
 
