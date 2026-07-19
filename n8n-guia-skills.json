@@ -227,6 +227,7 @@
       "name": "Guardar lead",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
+      "continueOnFail": true,
       "position": [
         840,
         300
@@ -339,7 +340,7 @@
       "main": [
         [
           {
-            "node": "Guardar lead",
+            "node": "Responder OK",
             "type": "main",
             "index": 0
           }
@@ -358,17 +359,6 @@
       ]
     },
     "Enviar material de clase por correo": {
-      "main": [
-        [
-          {
-            "node": "Guardar lead",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Guardar lead": {
       "main": [
         [
           {
