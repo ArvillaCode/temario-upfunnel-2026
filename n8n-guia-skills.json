@@ -24,7 +24,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// El navegador ya valida, pero eso se salta con un curl.\n// Esta es la validación real: nada de lo de abajo confía en el cliente.\n\nconst salida = [];\n\nfor (const item of $input.all()) {\n  const b = item.json.body ?? item.json;\n\n  const nombre   = String(b.nombre   ?? '').trim().slice(0, 80);\n  const whatsapp = String(b.whatsapp ?? '').trim();\n  const correo   = String(b.correo   ?? '').trim().toLowerCase();\n  const trampa   = String(b.web      ?? '').trim();\n  const recurso  = String(b.recurso  ?? 'guia-skills').trim();\n\n  // Formato de correo\n  const formatoOk = /^[^\\s@]+@[^\\s@]+\\.[a-z]{2,}$/i.test(correo);\n\n  // Dominios desechables\n  const desechables = ['mailinator.com','tempmail.com','10minutemail.com','guerrillamail.com','yopmail.com','trashmail.com','sharklasers.com'];\n  const dominio = correo.split('@')[1] || '';\n  const esDesechable = desechables.includes(dominio);\n\n  // WhatsApp normalizado a E.164 (7 a 15 dígitos)\n  const soloDigitos = whatsapp.replace(/\\D/g, '');\n  const whatsappOk = soloDigitos.length >= 7 && soloDigitos.length <= 15;\n\n  // Si el honeypot viene lleno, es un bot: se descarta en silencio\n  const esBot = trampa.length > 0;\n\n  const valido = Boolean(nombre) && formatoOk && !esDesechable && whatsappOk && !esBot;\n\n  let motivo = '';\n  if (esBot)             motivo = 'bot';\n  else if (!nombre)      motivo = 'Escribe tu nombre.';\n  else if (!formatoOk)   motivo = 'Ese correo no tiene un formato válido.';\n  else if (esDesechable) motivo = 'Usa un correo real: ahí es donde te llega el material.';\n  else if (!whatsappOk)  motivo = 'Revisa el número de WhatsApp.';\n\n  salida.push({\n    json: {\n      nombre,\n      whatsapp: soloDigitos ? '+' + soloDigitos : '',\n      correo,\n      recurso,\n      valido,\n      motivo,\n      fecha: new Date().toISOString(),\n      origen: 'pagina-clases-upfunnel'\n    }\n  });\n}\n\nreturn salida;"
+        "jsCode": "const salida = [];\n\nfor (const item of $input.all()) {\n  const b = item.json.body ?? item.json;\n\n  const nombre   = String(b.nombre   ?? '').trim().slice(0, 80);\n  const whatsapp = String(b.whatsapp ?? '').trim();\n  const correo   = String(b.correo   ?? '').trim().toLowerCase();\n  const trampa   = String(b.web      ?? '').trim();\n  const recurso  = String(b.recurso  ?? 'guia-skills').trim();\n\n  const formatoOk = /^[^\\s@]+@[^\\s@]+\\.[a-z]{2,}$/i.test(correo);\n\n  const desechables = ['mailinator.com','tempmail.com','10minutemail.com','guerrillamail.com','yopmail.com','trashmail.com','sharklasers.com'];\n  const dominio = correo.split('@')[1] || '';\n  const esDesechable = desechables.includes(dominio);\n\n  const soloDigitos = whatsapp.replace(/\\D/g, '');\n  const whatsappOk = soloDigitos.length >= 7 && soloDigitos.length <= 15;\n\n  const esBot = trampa.length > 0;\n\n  const valido = Boolean(nombre) && formatoOk && !esDesechable && whatsappOk && !esBot;\n\n  let motivo = '';\n  if (esBot)             motivo = 'bot';\n  else if (!nombre)      motivo = 'Escribe tu nombre.';\n  else if (!formatoOk)   motivo = 'Ese correo no tiene un formato válido.';\n  else if (esDesechable) motivo = 'Usa un correo real: ahí es donde te llega el material.';\n  else if (!whatsappOk)  motivo = 'Revisa el número de WhatsApp.';\n\n  salida.push({\n    json: {\n      nombre,\n      whatsapp: soloDigitos ? '+' + soloDigitos : '',\n      correo,\n      recurso,\n      valido,\n      motivo,\n      fecha: new Date().toISOString(),\n      origen: 'pagina-clases-upfunnel'\n    }\n  });\n}\n\nreturn salida;"
       },
       "id": "validar",
       "name": "Validar y normalizar",
@@ -71,66 +71,32 @@
     },
     {
       "parameters": {
-        "dataType": "rules",
-        "rules": {
-          "values": [
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
             {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "sw-guia",
-                    "leftValue": "={{ $json.recurso }}",
-                    "rightValue": "guia-skills",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": false,
-              "outputKey": "guia-skills"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "sw-clase",
-                    "leftValue": "={{ $json.recurso }}",
-                    "rightValue": "clase-2026-07-18",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": false,
-              "outputKey": "clase-2026-07-18"
+              "id": "cond-clase",
+              "leftValue": "={{ $json.recurso }}",
+              "rightValue": "clase-2026-07-18",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
             }
           ],
-          "fallbackOutput": "raw"
+          "combinator": "and"
         },
         "options": {}
       },
-      "id": "switch-recurso",
-      "name": "¿Qué recurso?",
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3,
+      "id": "if-clase",
+      "name": "¿Es material de clase?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
       "position": [
         180,
         300
@@ -154,7 +120,7 @@
       "typeVersion": 4.2,
       "position": [
         400,
-        180
+        440
       ]
     },
     {
@@ -174,7 +140,7 @@
       "typeVersion": 2.1,
       "position": [
         620,
-        180
+        440
       ],
       "credentials": {
         "smtp": {
@@ -201,7 +167,7 @@
       "typeVersion": 4.2,
       "position": [
         400,
-        420
+        160
       ]
     },
     {
@@ -209,7 +175,7 @@
         "fromEmail": "gabriel@upfunnel.click",
         "toEmail": "={{ $('Validar y normalizar').item.json.correo }}",
         "subject": "=Material de la clase del 18 de julio, {{ $('Validar y normalizar').item.json.nombre }}",
-        "html": "=<div style=\"font-family:Inter,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#0f172a;max-width:600px\">\n<p>Hola {{ $('Validar y normalizar').item.json.nombre }}, ¡qué bueno tenerte por acá!</p>\n\n<p>Te adjunto el material de la clase del sábado 18 de julio: <strong>Mastering AI Context</strong>.</p>\n\n<p>Es el PDF que entregamos en vivo — cómo darle contexto real a la IA para que trabaje como si conociera tu negocio. Revisalo con calma, y si algo no te cuadra o querés aplicarlo a tu caso, tráelo a la comunidad.</p>\n\n<p>👉🏻 La comunidad de WhatsApp, donde aviso las clases de los sábados a las 8 p.m. hora Colombia:<br>\n<a href=\"https://chat.whatsapp.com/GaH7I3tUJtiHYAP8nvSEfh\" style=\"color:#0891b2;font-weight:600\">Entrar a la comunidad</a></p>\n\n<p>Si tenés dudas, respondé este correo. Lo leo yo, no un bot.</p>\n\n<p>Un abrazo,<br><strong>Gabriel</strong> — Upfunnel<br>\n<span style=\"color:#64748b;font-size:13px\">Automatiza, reduce tu esfuerzo y potencia tus resultados.</span></p>\n</div>",
+        "html": "=<div style=\"font-family:Inter,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.65;color:#0f172a;max-width:600px\">\n<p>Hola {{ $('Validar y normalizar').item.json.nombre }}, ¡qué bueno tenerte por acá!</p>\n\n<p>Te adjunto el material de la clase del sábado 18 de julio: <strong>Mastering AI Context</strong>.</p>\n\n<p>Es el PDF que entregamos en vivo — cómo darle contexto real a la IA para que trabaje como si conociera tu negocio. Revisalo con calma, y si algo no te cuadra o querés aplicarlo a tu caso, traélo a la comunidad.</p>\n\n<p>👉🏻 La comunidad de WhatsApp, donde aviso las clases de los sábados a las 8 p.m. hora Colombia:<br>\n<a href=\"https://chat.whatsapp.com/GaH7I3tUJtiHYAP8nvSEfh\" style=\"color:#0891b2;font-weight:600\">Entrar a la comunidad</a></p>\n\n<p>Si tenés dudas, respondé este correo. Lo leo yo, no un bot.</p>\n\n<p>Un abrazo,<br><strong>Gabriel</strong> — Upfunnel<br>\n<span style=\"color:#64748b;font-size:13px\">Automatiza, reduce tu esfuerzo y potencia tus resultados.</span></p>\n</div>",
         "options": {
           "attachments": "material",
           "replyTo": "gabriel@upfunnel.click"
@@ -221,7 +187,7 @@
       "typeVersion": 2.1,
       "position": [
         620,
-        420
+        160
       ],
       "credentials": {
         "smtp": {
@@ -326,7 +292,7 @@
       "main": [
         [
           {
-            "node": "¿Qué recurso?",
+            "node": "¿Es material de clase?",
             "type": "main",
             "index": 0
           }
@@ -340,18 +306,18 @@
         ]
       ]
     },
-    "¿Qué recurso?": {
+    "¿Es material de clase?": {
       "main": [
         [
           {
-            "node": "Traer la guía (PDF)",
+            "node": "Traer material clase 18 JUL",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Traer material clase 18 JUL",
+            "node": "Traer la guía (PDF)",
             "type": "main",
             "index": 0
           }
