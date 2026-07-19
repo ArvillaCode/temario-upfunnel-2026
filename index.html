@@ -165,6 +165,17 @@ h1 .accent{color:var(--uf-accent)}
   border-radius:4px;padding:3px 8px;
 }
 
+/* ---------- Recursos por clase ---------- */
+.recurso-card{
+  display:flex;gap:22px;padding:22px 16px;margin:0 -16px;border-radius:10px;
+  border-bottom:1px solid rgba(148,163,184,.15);
+  transition:background .3s var(--ease),transform .3s var(--ease);
+}
+.recurso-card:hover{background:rgba(0,229,255,.045);transform:translateX(7px)}
+.recurso-card h3{font-size:17px;font-weight:700;letter-spacing:-.01em}
+.recurso-card p{color:var(--uf-muted);font-size:14.5px;margin-top:6px}
+.recurso-card .date{flex:0 0 92px;font-weight:700;font-size:14px;color:var(--uf-accent);padding-top:2px}
+
 .bank{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:20px}
 .bank div{padding:22px;border-radius:12px;transition:transform .35s var(--bounce),border-color .35s var(--ease)}
 .bank div:hover{transform:translateY(-6px);border-color:rgba(0,229,255,.4)}
@@ -442,6 +453,23 @@ footer p{color:var(--uf-muted);font-size:15px;margin-top:12px;max-width:58ch}
     </div>
   </div>
 
+  <a class="chain reveal" href="#recursos">¿Te perdiste alguna? Agarrá el material ▾</a>
+
+  <!-- ================= RECURSOS POR CLASE ================= -->
+  <div class="section-head reveal" id="recursos">
+    <h2>Material de cada clase</h2>
+    <p>Si no pudiste estar en vivo, acá te llevas lo que entregamos ese día. Llega a tu correo igual que la guía.</p>
+  </div>
+
+  <div class="recurso-card reveal uf-border">
+    <div class="date">18 JUL</div>
+    <div>
+      <h3>Mastering AI Context</h3>
+      <p>El PDF que entregamos en la primera clase: cómo darle contexto real a la IA para que trabaje como si conociera tu negocio.</p>
+      <button class="cta-ghost btn-recurso" data-recurso="clase-2026-07-18" style="margin-top:14px;cursor:pointer">Recibir material de esta clase</button>
+    </div>
+  </div>
+
   <a class="chain reveal" href="#testimonios">No me creas a mí. Míralos a ellos ▾</a>
 
   <!-- ================= TESTIMONIOS ================= -->
@@ -650,8 +678,13 @@ document.addEventListener('DOMContentLoaded', function(){
       btn     = document.getElementById('btnEnviar'),
       errGlob = document.getElementById('errorGlobal');
 
-  function abrir(e){
+  function abrir(e, idRecurso){
     if(e) e.preventDefault();
+    document.getElementById('recurso').value = idRecurso || 'guia-skills';
+    var esGuia = idRecurso === 'guia-skills';
+    document.getElementById('modalTitulo').textContent = esGuia ? '¿A qué correo te mando la guía?' : '¿A qué correo te mando el material?';
+    document.getElementById('modalLead').textContent = esGuia ? 'Son 9 páginas con ejercicios. Llega en menos de un minuto y no cuesta nada.' : 'Te llega al correo en menos de un minuto. Sin más pasos.';
+    document.getElementById('btnEnviar').textContent = esGuia ? 'Enviarme la guía' : 'Enviarme el material';
     modal.classList.add('abierto');
     requestAnimationFrame(function(){ modal.classList.add('visible'); });
     document.body.style.overflow='hidden';
@@ -660,9 +693,10 @@ document.addEventListener('DOMContentLoaded', function(){
   function cerrar(){
     modal.classList.remove('visible');
     setTimeout(function(){ modal.classList.remove('abierto'); document.body.style.overflow=''; }, 300);
+    document.getElementById('recurso').value = 'guia-skills';
   }
 
-  document.getElementById('btnGuia').addEventListener('click', abrir);
+  document.getElementById('btnGuia').addEventListener('click', function(e){ abrir(e, 'guia-skills'); });
   document.getElementById('cerrarModal').addEventListener('click', cerrar);
   modal.addEventListener('click', function(e){ if(e.target === modal) cerrar(); });
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && modal.classList.contains('abierto')) cerrar(); });
@@ -686,7 +720,12 @@ document.addEventListener('DOMContentLoaded', function(){
     return okNombre && okWhatsapp && okCorreo;
   }
 
-  /* Valida al salir del campo, no mientras escribe: molesta menos */
+  /* ---- Botones de recursos por clase ---- */
+  document.querySelectorAll('.btn-recurso').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      abrir(e, btn.getAttribute('data-recurso'));
+    });
+  });
   ['nombre','whatsapp','correo'].forEach(function(id){
     document.getElementById(id).addEventListener('blur', validar);
   });
@@ -706,6 +745,7 @@ document.addEventListener('DOMContentLoaded', function(){
         nombre:   document.getElementById('nombre').value.trim(),
         whatsapp: document.getElementById('whatsapp').value.trim(),
         correo:   document.getElementById('correo').value.trim(),
+        recurso:  document.getElementById('recurso').value,
         web:      document.getElementById('web').value
       })
     })
@@ -719,10 +759,11 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     })
     .catch(function(err){
-      errGlob.textContent = err.message + ' Si sigue fallando, escríbeme por WhatsApp y te la mando yo.';
+      var esGuia = document.getElementById('recurso').value === 'guia-skills';
+      errGlob.textContent = err.message + ' Si sigue fallando, escríbeme por WhatsApp y te lo mando yo.';
       errGlob.classList.add('ver');
       btn.disabled = false;
-      btn.textContent = 'Enviarme la guía';
+      btn.textContent = esGuia ? 'Enviarme la guía' : 'Enviarme el material';
     });
   });
 });
@@ -734,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     <div id="vistaForm">
       <h3 id="modalTitulo">¿A qué correo te mando la guía?</h3>
-      <p class="lead">Son 9 páginas con ejercicios. Llega en menos de un minuto y no cuesta nada.</p>
+      <p class="lead" id="modalLead">Son 9 páginas con ejercicios. Llega en menos de un minuto y no cuesta nada.</p>
 
       <form id="formGuia" novalidate>
         <div class="campo">
@@ -760,6 +801,8 @@ document.addEventListener('DOMContentLoaded', function(){
           <label for="web">No llenar</label>
           <input type="text" id="web" name="web" tabindex="-1" autocomplete="off">
         </div>
+
+        <input type="hidden" id="recurso" name="recurso" value="guia-skills">
 
         <button type="submit" class="btn-enviar" id="btnEnviar">Enviarme la guía</button>
         <div class="error-global" id="errorGlobal"></div>
