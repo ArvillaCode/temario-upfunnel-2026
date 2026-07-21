@@ -341,9 +341,14 @@ letter-spacing:.12em;text-transform:uppercase;margin-top:7px;
 display:flex;flex-direction:column;gap:16px;padding:26px;border-radius:14px;
 text-decoration:none;color:var(--uf-text);
 background:linear-gradient(180deg,rgba(0,229,255,.05),rgba(8,12,20,0));
+overflow:hidden;
 transition:transform .35s var(--bounce),border-color .35s var(--ease),box-shadow .35s var(--ease);
 }
 .recurso-card:hover{transform:translateY(-6px);border-color:rgba(0,229,255,.45);box-shadow:0 0 30px rgba(0,229,255,.15)}
+.recurso-cover{
+display:block;width:calc(100% + 52px);aspect-ratio:16/9;object-fit:cover;
+margin:-26px -26px 4px;border-bottom:1px solid rgba(0,229,255,.18);
+}
 .recurso-icon{
 width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;
 background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);
@@ -809,12 +814,16 @@ var RECURSOS = [
 nombre: 'SnapRec',
 descripcion: 'Graba pantalla y cámara al mismo tiempo sin que tu PC se congele. 100% desde el navegador.',
 enlace: 'https://snaprec.upfunnel.click/',
+portada: 'Developer_recording_video_tutorial_2K_202607211159.jpeg',
+alt: 'Portada de SnapRec, herramienta para grabar pantalla y cámara',
 icono: '<path d="M4 7a2 2 0 012-2h9a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M17 10l4-2v8l-4-2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>'
 },
 {
 nombre: 'Teleprompter Pro',
 descripcion: 'Lee tu guion en pantalla mientras grabas, con velocidad y overlay ajustables. También 100% online.',
 enlace: 'https://teleprompter-pro.upfunnel.click/',
+portada: 'Female_presenter_with_text_overlay_202607211200.jpeg',
+alt: 'Portada de Teleprompter Pro para presentar un guion frente a cámara',
 icono: '<rect x="4" y="5" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
 }
 ];
@@ -827,6 +836,7 @@ card.href = r.enlace;
 card.target = '_blank';
 card.rel = 'noopener noreferrer';
 card.innerHTML =
+'<img class="recurso-cover" src="' + r.portada + '" alt="' + r.alt + '" loading="lazy" decoding="async">' +
 '<div class="recurso-icon"><svg viewBox="0 0 24 24" fill="none" style="color:var(--uf-accent)">' + r.icono + '</svg></div>' +
 '<h3>' + r.nombre + '</h3>' +
 '<p>' + r.descripcion + '</p>' +
