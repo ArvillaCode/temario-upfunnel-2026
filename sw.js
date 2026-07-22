@@ -1,12 +1,55 @@
-// Service worker mínimo — solo cumple el requisito de instalabilidad.
-// No cachea nada a propósito: el sitio se decidió instalable, sin soporte offline.
+const CACHE_NAME = 'upfunnel-recursos-v2';
+const APP_SHELL = [
+  './',
+  './index.html',
+  './manifest.json',
+  './inter-latin.woff2',
+  './logo-upfunnel-160.webp',
+  './logo-upfunnel-320.webp',
+  './snaprec-cover-480.webp',
+  './teleprompter-cover-480.webp',
+  './gabriel-320.webp',
+  './icon-180.png',
+  './icon-192.png',
+  './icon-512.png'
+];
 
 self.addEventListener('install', function (event) {
+  event.waitUntil(caches.open(CACHE_NAME).then(function (cache) {
+    return cache.addAll(APP_SHELL);
+  }));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', function (event) {
-  self.clients.claim();
+  event.waitUntil(caches.keys().then(function (keys) {
+    return Promise.all(keys.filter(function (key) {
+      return key !== CACHE_NAME;
+    }).map(function (key) {
+      return caches.delete(key);
+    }));
+  }).then(function () {
+    return self.clients.claim();
+  }));
 });
 
-// Sin evento 'fetch': todas las peticiones van directo a la red, como en un sitio normal.
+self.addEventListener('fetch', function (event) {
+  var request = event.request;
+  var url = new URL(request.url);
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request).then(function (response) {
+      var copy = response.clone();
+      caches.open(CACHE_NAME).then(function (cache) { cache.put('./index.html', copy); });
+      return response;
+    }).catch(function () {
+      return caches.match('./index.html');
+    }));
+    return;
+  }
+
+  event.respondWith(caches.match(request, {ignoreSearch:true}).then(function (cached) {
+    return cached || fetch(request);
+  }));
+});

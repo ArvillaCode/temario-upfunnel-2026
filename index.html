@@ -6,7 +6,7 @@
 <title>Clases en vivo — Upfunnel</title>
 <meta name="description" content="Clases en vivo todos los sábados para emprendedores. Automatiza lo repetitivo con IA. Descarga gratis el material de la clase de Claude Skills.">
 <link rel="canonical" href="https://recursos.upfunnel.click/">
-<link rel="icon" type="image/png" href="https://recursos.upfunnel.click/logo-upfunnel.png">
+<link rel="icon" type="image/webp" href="logo-upfunnel-160.webp">
 
 <!-- ============ PWA ============ -->
 <link rel="manifest" href="manifest.json">
@@ -34,10 +34,12 @@
 <meta name="twitter:description" content="Clases en vivo gratis todos los sábados 8 p.m. Colombia. La guía de Claude Skills te llega al correo.">
 <meta name="twitter:image" content="https://recursos.upfunnel.click/og-upfunnel.png">
 <meta name="theme-color" content="#080C14">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{
+font-family:'Inter';font-style:normal;font-weight:400 800;font-display:swap;
+src:url('inter-latin.woff2') format('woff2');
+}
 :root{
 --uf-bg:#080C14;
 --uf-accent:#00E5FF;
@@ -54,8 +56,18 @@ background:var(--uf-bg);color:var(--uf-text);font-family:var(--uf-font);
 font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased;
 overflow-x:hidden;
 }
+.skip-link{
+position:fixed;top:10px;left:10px;z-index:300;padding:10px 14px;border-radius:8px;
+background:var(--uf-accent);color:var(--uf-bg);font-weight:800;text-decoration:none;
+transform:translateY(-150%);transition:transform .2s var(--ease);
+}
+.skip-link:focus{transform:none}
+main:focus{outline:none}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{
+outline:3px solid var(--uf-accent);outline-offset:3px;
+}
 /* ---------- Parallax: capas de fondo ---------- */
-.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none;will-change:transform}
+.bg-layer{position:fixed;inset:0;z-index:0;pointer-events:none}
 .bg-grid{
 background-image:linear-gradient(rgba(148,163,184,.05) 1px,transparent 1px),
 linear-gradient(90deg,rgba(148,163,184,.05) 1px,transparent 1px);
@@ -70,18 +82,17 @@ filter:blur(28px);
 }
 /* ---------- Barra de progreso ---------- */
 .progress{
-position:fixed;top:0;left:0;height:2px;width:0;z-index:99;
+position:fixed;top:0;left:0;height:2px;width:100%;z-index:99;transform:scaleX(0);transform-origin:left;
 background:var(--uf-accent);box-shadow:0 0 12px rgba(0,229,255,.7);
-transition:width .08s linear;
+animation:scroll-progress linear;animation-timeline:scroll();
 }
+@keyframes scroll-progress{to{transform:scaleX(1)}}
+@supports not (animation-timeline:scroll()){.progress{display:none}}
 .wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 24px}
 .uf-border{border:1px solid rgba(148,163,184,.25)}
 .uf-glow{box-shadow:0 0 24px rgba(0,229,255,.35)}
-/* ---------- Animación entrada / salida ---------- */
-.reveal{opacity:0;transform:translateY(34px) scale(.985);transition:opacity .5s var(--ease),transform .7s var(--bounce)}
-.reveal.in{opacity:1;transform:none}
-.reveal.out{opacity:0;transform:translateY(-18px) scale(.99);transition:opacity .35s var(--ease),transform .35s var(--ease)}
-.d1{transition-delay:.06s}.d2{transition-delay:.12s}.d3{transition-delay:.18s}.d4{transition-delay:.24s}
+/* El contenido esencial siempre es visible; las transiciones son decorativas. */
+.reveal{opacity:1;transform:none}
 
 /* ---------- Header fijo + navegación ---------- */
 header{
@@ -90,7 +101,7 @@ background:rgba(8,12,20,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:
 border-bottom:1px solid rgba(148,163,184,.12);
 }
 .nav-row{display:flex;align-items:center;justify-content:space-between;gap:20px}
-header img.logo{width:150px;height:auto;display:block;transition:transform .4s var(--bounce)}
+header img.logo{width:150px;height:57px;display:block;transition:transform .4s var(--bounce)}
 header img.logo:hover{transform:scale(1.04)}
 .nav-links{display:flex;align-items:center;gap:30px;list-style:none}
 .nav-links a{
@@ -102,7 +113,7 @@ transition:color .2s var(--ease),border-color .2s var(--ease);
 .nav-links a.active{color:var(--uf-accent);border-color:var(--uf-accent)}
 .hamburger{
 display:none;flex-direction:column;justify-content:center;gap:5px;
-width:38px;height:38px;background:transparent;border:1px solid rgba(148,163,184,.3);
+width:44px;height:44px;background:transparent;border:1px solid rgba(148,163,184,.3);
 border-radius:8px;cursor:pointer;padding:0;
 }
 .hamburger span{width:18px;height:2px;background:var(--uf-text);margin:0 auto;transition:transform .3s var(--bounce),opacity .2s}
@@ -112,9 +123,10 @@ border-radius:8px;cursor:pointer;padding:0;
 .mobile-panel{
 position:fixed;inset:0;z-index:70;background:var(--uf-bg);
 display:flex;flex-direction:column;padding:110px 32px 40px;
-transform:translateX(100%);transition:transform .4s var(--ease);
+transform:translateX(100%);visibility:hidden;pointer-events:none;
+transition:transform .4s var(--ease),visibility 0s linear .4s;
 }
-.mobile-panel.abierto{transform:translateX(0)}
+.mobile-panel.abierto{transform:translateX(0);visibility:visible;pointer-events:auto;transition-delay:0s}
 .mobile-panel a{
 color:var(--uf-text);text-decoration:none;font-size:24px;font-weight:800;
 padding:16px 0;border-bottom:1px solid rgba(148,163,184,.15);
@@ -178,7 +190,7 @@ padding:14px 26px;border-radius:10px;transition:background .25s var(--ease),tran
 .microcopy{color:var(--uf-muted);font-size:13px;margin-top:14px}
 /* ---------- Secciones ---------- */
 .section-head{margin:84px 0 8px}
-.section-head h2{font-size:29px;font-weight:800;letter-spacing:-.015em}
+.section-head h1,.section-head h2{font-size:29px;font-weight:800;letter-spacing:-.015em;max-width:none}
 .section-head p{color:var(--uf-muted);margin-top:10px;font-size:15.5px;max-width:60ch}
 .block-label{
 display:flex;align-items:center;gap:14px;margin:46px 0 18px;font-size:12px;font-weight:700;
@@ -345,8 +357,9 @@ overflow:hidden;
 transition:transform .35s var(--bounce),border-color .35s var(--ease),box-shadow .35s var(--ease);
 }
 .recurso-card:hover{transform:translateY(-6px);border-color:rgba(0,229,255,.45);box-shadow:0 0 30px rgba(0,229,255,.15)}
+.recurso-card:focus-visible{border-color:var(--uf-accent);box-shadow:0 0 30px rgba(0,229,255,.2)}
 .recurso-cover{
-display:block;width:calc(100% + 52px);aspect-ratio:16/9;object-fit:cover;
+display:block;width:calc(100% + 52px);height:auto;aspect-ratio:16/9;object-fit:cover;
 margin:-26px -26px 4px;border-bottom:1px solid rgba(0,229,255,.18);
 }
 .recurso-icon{
@@ -354,7 +367,7 @@ width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justif
 background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);
 }
 .recurso-icon svg{width:26px;height:26px}
-.recurso-card h3{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.recurso-card h2{font-size:18px;font-weight:800;letter-spacing:-.01em}
 .recurso-card p{color:var(--uf-muted);font-size:14.5px;line-height:1.55}
 .recurso-open{
 display:inline-flex;align-items:center;gap:8px;color:var(--uf-accent);
@@ -380,6 +393,9 @@ footer p{color:var(--uf-muted);font-size:15px;margin-top:12px;max-width:58ch}
 .class:hover{transform:none}
 .date{flex:none}
 .material,.join{padding:28px 22px}
+.bg-orb{display:none}
+.bg-layer{will-change:auto}
+header{background:var(--uf-bg);backdrop-filter:none;-webkit-backdrop-filter:none}
 }
 /* Accesibilidad: respeta a quien pide menos movimiento */
 @media(prefers-reduced-motion:reduce){
@@ -390,6 +406,8 @@ html{scroll-behavior:auto}
 </style>
 </head>
 <body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<noscript><style>[data-page][hidden]{display:block!important}.mobile-panel,.hamburger{display:none!important}</style></noscript>
 <div class="progress" id="progress"></div>
 <div class="bg-layer bg-grid" id="pxGrid"></div>
 <div class="bg-layer bg-orb" id="pxOrb"></div>
@@ -398,15 +416,31 @@ html{scroll-behavior:auto}
 
 <header class="reveal">
 <div class="nav-row">
-<a href="#/"><img class="logo" src="logo-upfunnel.png" alt="UpFunnel"></a>
-<ul class="nav-links" id="navLinks"></ul>
-<button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false">
+<a href="#/" aria-label="Upfunnel, ir al inicio"><img class="logo" src="logo-upfunnel-160.webp" srcset="logo-upfunnel-160.webp 160w, logo-upfunnel-320.webp 320w" sizes="150px" width="160" height="61" alt="UpFunnel"></a>
+<nav aria-label="Navegación principal">
+<ul class="nav-links" id="navLinks">
+<li><a href="#/" data-hash="#/">Inicio</a></li>
+<li><a href="#/recursos" data-hash="#/recursos">Recursos</a></li>
+<li><a href="#/herramientas" data-hash="#/herramientas">Herramientas</a></li>
+<li><a href="#/productos" data-hash="#/productos">Productos</a></li>
+<li><a href="#/servicios" data-hash="#/servicios">Servicios</a></li>
+</ul>
+</nav>
+<button class="hamburger" id="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobilePanel">
 <span></span><span></span><span></span>
 </button>
 </div>
 </header>
 
-<nav class="mobile-panel" id="mobilePanel"></nav>
+<nav class="mobile-panel" id="mobilePanel" aria-label="Navegación móvil" inert>
+<a href="#/" data-hash="#/">Inicio</a>
+<a href="#/recursos" data-hash="#/recursos">Recursos</a>
+<a href="#/herramientas" data-hash="#/herramientas">Herramientas</a>
+<a href="#/productos" data-hash="#/productos">Productos</a>
+<a href="#/servicios" data-hash="#/servicios">Servicios</a>
+</nav>
+
+<main id="contenido" tabindex="-1">
 
 <!-- ================= PÁGINA: INICIO ================= -->
 <div data-page="#/">
@@ -422,7 +456,7 @@ html{scroll-behavior:auto}
 <p>Todos empezamos ahí. Acá nadie juzga a nadie.</p>
 </div>
 <ul class="bullets reveal d3">
-<li><span class="ic">🎯</span><span>13 sábados de clases en vivo, arrancando el 18 de julio.</span></li>
+<li><span class="ic">🎯</span><span>13 sábados de clases en vivo desde el 18 de julio.</span></li>
 <li><span class="ic">🚀</span><span>Cada clase sale con algo aplicable ese mismo día, no con apuntes.</span></li>
 <li><span class="ic">👀</span><span>La guía de Claude Skills son 9 páginas con ejercicios, y es gratis.</span></li>
 </ul>
@@ -434,7 +468,7 @@ html{scroll-behavior:auto}
 <h2>La guía de Claude Skills, gratis a tu correo</h2>
 <p>La guía de 9 páginas que se entregó a la comunidad para la charla de Claude Skills: qué es un skill, los 3 niveles con los que Claude los carga, la fórmula de una descripción que sí se activa, las 5 reglas técnicas que no se pueden romper y un glosario exprés.</p>
 <p>Trae campos rellenables, checklist y ejercicios — no es un folleto de dos carillas. No te la cuento: te la mando entera, sin cobrarte nada y sin pedirte que primero te ganes la confianza.</p>
-<p>Te pido tu correo por una sola razón, y te la digo de frente: es el único modo de mandártela y de avisarte cuando haya clase. No hay segundo paso, ni versión premium, ni nada que comprar después.</p>
+<p>Te pido el correo para mandarte la guía y avisarte cuando haya clase. El WhatsApp nos permite ayudarte si tienes problemas con la entrega. No hay versión premium ni nada que comprar después.</p>
 <a class="cta uf-glow" href="#" id="btnGuia">Sí, quiero que me llegue la guía</a>
 <p class="microcopy">Gratis. Llega a tu correo en menos de un minuto, sin más pasos.</p>
 </section>
@@ -539,7 +573,7 @@ html{scroll-behavior:auto}
 <div class="faq reveal">
 <details>
 <summary>Nunca he usado IA para nada serio, ¿voy muy tarde?</summary>
-<p>No. La clase del 18 de julio arranca desde cero y no asume que hayas visto nada anterior. Es la puerta de entrada, y por diseño se sostiene sola: no vas a llegar a un salón donde todos ya saben algo que tú no.</p>
+<p>No. Las clases arrancan desde cero y no asumen que hayas visto nada anterior. Cada sesión se sostiene sola: no vas a llegar a un salón donde todos ya saben algo que tú no.</p>
 </details>
 <details>
 <summary>¿Necesito saber programar?</summary>
@@ -551,7 +585,7 @@ html{scroll-behavior:auto}
 </details>
 <details>
 <summary>Si es gratis, ¿por qué me piden el correo?</summary>
-<p>Porque es el único modo de mandarte la guía y de avisarte cuando haya clase. Eso es todo lo que hago con él: no lo vendo, no lo paso a nadie, y no vas a entrar a una secuencia de doce correos vendiéndote algo. Si te cansa, te das de baja y ya.</p>
+<p>El correo sirve para mandarte la guía y avisarte cuando haya clase. El WhatsApp nos permite ayudarte si la entrega falla. No vendo tus datos, no los comparto y puedes pedir que dejemos de contactarte cuando quieras.</p>
 </details>
 <details>
 <summary>¿Cuánto cuestan?</summary>
@@ -598,7 +632,7 @@ html{scroll-behavior:auto}
 
 <!-- ================= AUTORIDAD ================= -->
 <section class="autoridad uf-border reveal" id="sobre-gabriel">
-<img class="foto" src="Gemini_Generated_Image_7z57ac7z57ac7z57.png" alt="Gabriel Aristizábal, creador de Upfunnel">
+<img class="foto" src="gabriel-320.webp" width="320" height="320" loading="lazy" decoding="async" alt="Gabriel Aristizábal, creador de Upfunnel">
 <div>
 <h2>Gabriel Aristizábal</h2>
 <div class="rol">Creador de Upfunnel · Líder de la comunidad</div>
@@ -612,18 +646,33 @@ html{scroll-behavior:auto}
 <!-- ============= FIN PÁGINA: INICIO ============= -->
 
 <!-- ================= PÁGINA: RECURSOS ================= -->
-<div data-page="#/recursos" style="display:none">
+<div data-page="#/recursos" hidden>
 <div class="section-head reveal in" style="margin-top:56px">
-<h2>Recursos</h2>
+<h1>Recursos</h1>
 <p>Las herramientas que uso yo mismo, funcionando 100% online — sin nada que instalar ni descargar. Clic y las usas.</p>
 </div>
-<div class="recursos-grid" id="recursosGrid"></div>
+<div class="recursos-grid" id="recursosGrid">
+<a class="recurso-card uf-border" href="https://snaprec.upfunnel.click/" target="_blank" rel="noopener noreferrer">
+<img class="recurso-cover" src="snaprec-cover-480.webp" width="480" height="270" fetchpriority="high" decoding="async" alt="Portada de SnapRec, herramienta para grabar pantalla y cámara">
+<div class="recurso-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" style="color:var(--uf-accent)"><path d="M4 7a2 2 0 012-2h9a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M17 10l4-2v8l-4-2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg></div>
+<h2>SnapRec</h2>
+<p>Graba pantalla y cámara al mismo tiempo sin que tu PC se congele. 100% desde el navegador.</p>
+<span class="recurso-open">Abrir herramienta ↗</span>
+</a>
+<a class="recurso-card uf-border" href="https://teleprompter-pro.upfunnel.click/" target="_blank" rel="noopener noreferrer">
+<img class="recurso-cover" src="teleprompter-cover-480.webp" width="480" height="270" loading="lazy" decoding="async" alt="Portada de Teleprompter Pro para presentar un guion frente a cámara">
+<div class="recurso-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" style="color:var(--uf-accent)"><rect x="4" y="5" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+<h2>Teleprompter Pro</h2>
+<p>Lee tu guion en pantalla mientras grabas, con velocidad y overlay ajustables. También 100% online.</p>
+<span class="recurso-open">Abrir herramienta ↗</span>
+</a>
+</div>
 </div>
 
 <!-- ================= PÁGINA: HERRAMIENTAS ================= -->
-<div data-page="#/herramientas" style="display:none">
+<div data-page="#/herramientas" hidden>
 <div class="section-head reveal in" style="margin-top:56px">
-<h2>Herramientas</h2>
+<h1>Herramientas</h1>
 <p>Automatizaciones y sistemas a la medida para tu negocio.</p>
 </div>
 <div class="proximamente uf-border">
@@ -634,9 +683,9 @@ html{scroll-behavior:auto}
 </div>
 
 <!-- ================= PÁGINA: PRODUCTOS ================= -->
-<div data-page="#/productos" style="display:none">
+<div data-page="#/productos" hidden>
 <div class="section-head reveal in" style="margin-top:56px">
-<h2>Productos</h2>
+<h1>Productos</h1>
 <p>Lo que estamos construyendo para que lo uses tú mismo, sin depender de mí.</p>
 </div>
 <div class="proximamente uf-border">
@@ -647,9 +696,9 @@ html{scroll-behavior:auto}
 </div>
 
 <!-- ================= PÁGINA: SERVICIOS ================= -->
-<div data-page="#/servicios" style="display:none">
+<div data-page="#/servicios" hidden>
 <div class="section-head reveal in" style="margin-top:56px">
-<h2>Servicios</h2>
+<h1>Servicios</h1>
 <p>Automatización y desarrollo con IA para agencias, coaches y consultores.</p>
 </div>
 <div class="proximamente uf-border">
@@ -658,6 +707,8 @@ html{scroll-behavior:auto}
 <a class="cta-ghost" href="https://wa.link/ktsfgt" style="margin-top:22px">↗ Hablar con Gabriel</a>
 </div>
 </div>
+
+</main>
 
 <footer class="reveal">
 <h3>Si necesitas acompañamiento en algo puntual, escríbeme al interno</h3>
@@ -669,47 +720,6 @@ html{scroll-behavior:auto}
 
 <script>
 (function(){
-var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-/* ---- Entrada y salida con IntersectionObserver ---- */
-if(!reduce && 'IntersectionObserver' in window){
-var io = new IntersectionObserver(function(entries){
-entries.forEach(function(e){
-if(e.isIntersecting){
-e.target.classList.add('in');
-e.target.classList.remove('out');
-} else if(e.boundingClientRect.top < 0){
-e.target.classList.remove('in');
-e.target.classList.add('out');
-}
-});
-}, {threshold:.12, rootMargin:'0px 0px -8% 0px'});
-document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
-} else {
-document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
-}
-
-/* ---- Parallax + barra de progreso ---- */
-var grid = document.getElementById('pxGrid'),
-orb = document.getElementById('pxOrb'),
-bar = document.getElementById('progress'),
-ticking = false;
-
-function onScroll(){
-var y = window.scrollY,
-h = document.documentElement.scrollHeight - window.innerHeight;
-bar.style.width = (h > 0 ? (y/h)*100 : 0) + '%';
-if(!reduce){
-grid.style.transform = 'translateY(' + (y * .18) + 'px)';
-orb.style.transform = 'translateY(' + (y * .34) + 'px)';
-}
-ticking = false;
-}
-window.addEventListener('scroll', function(){
-if(!ticking){ window.requestAnimationFrame(onScroll); ticking = true; }
-}, {passive:true});
-onScroll();
-
 /* ---- Copiar / compartir enlace ---- */
 var shareBtn = document.getElementById('shareBtn'),
 copiedMsg = document.getElementById('copied'),
@@ -750,41 +760,33 @@ copiarFallback();
 
 /* ================= Router de páginas (SPA por hash) ================= */
 (function(){
-var ROUTES = [
-{ nombre:'Inicio', hash:'#/' },
-{ nombre:'Recursos', hash:'#/recursos' },
-{ nombre:'Herramientas', hash:'#/herramientas' },
-{ nombre:'Productos', hash:'#/productos' },
-{ nombre:'Servicios', hash:'#/servicios' }
-];
-
-var navLinks = document.getElementById('navLinks'),
-mobilePanel = document.getElementById('mobilePanel'),
+var mobilePanel = document.getElementById('mobilePanel'),
 hamburger = document.getElementById('hamburger'),
-pages = document.querySelectorAll('[data-page]');
-
-/* Construye ambos menús a partir del mismo arreglo */
-ROUTES.forEach(function(r){
-var a1 = document.createElement('a');
-a1.href = r.hash; a1.textContent = r.nombre; a1.setAttribute('data-hash', r.hash);
-navLinks.appendChild(document.createElement('li')).appendChild(a1);
-
-var a2 = document.createElement('a');
-a2.href = r.hash; a2.textContent = r.nombre; a2.setAttribute('data-hash', r.hash);
-mobilePanel.appendChild(a2);
-});
+pages = document.querySelectorAll('[data-page]'),
+routeTitles = {
+'#/':'Clases en vivo — Upfunnel',
+'#/recursos':'Recursos — Upfunnel',
+'#/herramientas':'Herramientas — Upfunnel',
+'#/productos':'Productos — Upfunnel',
+'#/servicios':'Servicios — Upfunnel'
+};
 
 function cerrarMenuMovil(){
 hamburger.classList.remove('abierto');
 hamburger.setAttribute('aria-expanded','false');
+hamburger.setAttribute('aria-label','Abrir menú');
 mobilePanel.classList.remove('abierto');
+mobilePanel.inert = true;
 document.body.style.overflow = '';
 }
 hamburger.addEventListener('click', function(){
 var abierto = mobilePanel.classList.toggle('abierto');
 hamburger.classList.toggle('abierto', abierto);
 hamburger.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+hamburger.setAttribute('aria-label', abierto ? 'Cerrar menú' : 'Abrir menú');
+mobilePanel.inert = !abierto;
 document.body.style.overflow = abierto ? 'hidden' : '';
+if(abierto) mobilePanel.querySelector('a').focus();
 });
 mobilePanel.querySelectorAll('a').forEach(function(a){
 a.addEventListener('click', cerrarMenuMovil);
@@ -794,55 +796,32 @@ function router(){
 var hash = window.location.hash;
 if(!hash || hash === '#') hash = '#/';
 if(hash.indexOf('#/') !== 0) return; /* anclas normales (#material, etc.) siguen su curso */
+if(!routeTitles[hash]){
+window.location.hash = '#/';
+return;
+}
 
 pages.forEach(function(p){
-p.style.display = (p.getAttribute('data-page') === hash) ? '' : 'none';
+p.hidden = p.getAttribute('data-page') !== hash;
 });
 document.querySelectorAll('#navLinks a, #mobilePanel a').forEach(function(a){
-a.classList.toggle('active', a.getAttribute('data-hash') === hash);
+var active = a.getAttribute('data-hash') === hash;
+a.classList.toggle('active', active);
+if(active) a.setAttribute('aria-current','page');
+else a.removeAttribute('aria-current');
 });
+document.title = routeTitles[hash];
+cerrarMenuMovil();
 window.scrollTo(0,0);
 }
+document.addEventListener('keydown', function(e){
+if(e.key === 'Escape' && mobilePanel.classList.contains('abierto')){
+cerrarMenuMovil();
+hamburger.focus();
+}
+});
 window.addEventListener('hashchange', router);
 router();
-})();
-
-/* ================= Página Recursos (tarjetas data-driven) ================= */
-(function(){
-var RECURSOS = [
-{
-nombre: 'SnapRec',
-descripcion: 'Graba pantalla y cámara al mismo tiempo sin que tu PC se congele. 100% desde el navegador.',
-enlace: 'https://snaprec.upfunnel.click/',
-portada: 'Developer_recording_video_tutorial_2K_202607211159.jpeg',
-alt: 'Portada de SnapRec, herramienta para grabar pantalla y cámara',
-icono: '<path d="M4 7a2 2 0 012-2h9a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M17 10l4-2v8l-4-2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>'
-},
-{
-nombre: 'Teleprompter Pro',
-descripcion: 'Lee tu guion en pantalla mientras grabas, con velocidad y overlay ajustables. También 100% online.',
-enlace: 'https://teleprompter-pro.upfunnel.click/',
-portada: 'Female_presenter_with_text_overlay_202607211200.jpeg',
-alt: 'Portada de Teleprompter Pro para presentar un guion frente a cámara',
-icono: '<rect x="4" y="5" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>'
-}
-];
-
-var grid = document.getElementById('recursosGrid');
-RECURSOS.forEach(function(r){
-var card = document.createElement('a');
-card.className = 'recurso-card uf-border';
-card.href = r.enlace;
-card.target = '_blank';
-card.rel = 'noopener noreferrer';
-card.innerHTML =
-'<img class="recurso-cover" src="' + r.portada + '" alt="' + r.alt + '" loading="lazy" decoding="async">' +
-'<div class="recurso-icon"><svg viewBox="0 0 24 24" fill="none" style="color:var(--uf-accent)">' + r.icono + '</svg></div>' +
-'<h3>' + r.nombre + '</h3>' +
-'<p>' + r.descripcion + '</p>' +
-'<span class="recurso-open">Abrir herramienta ↗</span>';
-grid.appendChild(card);
-});
 })();
 
 /* ================= Formulario de la guía ================= */
@@ -851,44 +830,87 @@ var URL_WEBHOOK = 'https://xn8nx.upfunnel.click/webhook/guia-skills';
 var modal = document.getElementById('modal'),
 form = document.getElementById('formGuia'),
 btn = document.getElementById('btnEnviar'),
-errGlob = document.getElementById('errorGlobal');
+errGlob = document.getElementById('errorGlobal'),
+pageWrap = document.querySelector('.wrap'),
+lastFocused = null,
+sentSuccessfully = false;
+
+function resetDialogState(esGuia){
+document.getElementById('vistaForm').style.display='block';
+document.getElementById('vistaExito').style.display='none';
+modal.setAttribute('aria-labelledby','modalTitulo');
+modal.setAttribute('aria-describedby','modalLead');
+errGlob.classList.remove('ver');
+errGlob.textContent = '';
+btn.disabled = false;
+btn.textContent = esGuia ? 'Enviarme la guía' : 'Enviarme el material';
+document.querySelectorAll('.campo input').forEach(function(input){
+input.classList.remove('malo');
+input.removeAttribute('aria-invalid');
+});
+document.querySelectorAll('.error-campo').forEach(function(error){ error.classList.remove('ver'); });
+}
 
 function abrir(e, idRecurso){
 if(e) e.preventDefault();
+lastFocused = e && e.currentTarget ? e.currentTarget : document.activeElement;
 document.getElementById('recurso').value = idRecurso || 'guia-skills';
 var esGuia = idRecurso === 'guia-skills';
+if(sentSuccessfully){ form.reset(); sentSuccessfully = false; }
+resetDialogState(esGuia);
 document.getElementById('modalTitulo').textContent = esGuia ? '¿A qué correo te mando la guía?' : '¿A qué correo te mando el material?';
 document.getElementById('modalLead').textContent = esGuia ? 'Son 9 páginas con ejercicios. Llega en menos de un minuto y no cuesta nada.' : 'Te llega al correo en menos de un minuto. Sin más pasos.';
-document.getElementById('btnEnviar').textContent = esGuia ? 'Enviarme la guía' : 'Enviarme el material';
 modal.classList.add('abierto');
+modal.setAttribute('aria-hidden','false');
+pageWrap.inert = true;
 requestAnimationFrame(function(){ modal.classList.add('visible'); });
 document.body.style.overflow='hidden';
-setTimeout(function(){ document.getElementById('nombre').focus(); }, 300);
+setTimeout(function(){ document.getElementById('nombre').focus(); }, 100);
 }
 function cerrar(){
 modal.classList.remove('visible');
-setTimeout(function(){ modal.classList.remove('abierto'); document.body.style.overflow=''; }, 300);
+setTimeout(function(){
+modal.classList.remove('abierto');
+modal.setAttribute('aria-hidden','true');
+document.body.style.overflow='';
+pageWrap.inert = false;
+if(lastFocused && document.contains(lastFocused)) lastFocused.focus();
+}, 300);
 document.getElementById('recurso').value = 'guia-skills';
 }
 document.getElementById('btnGuia').addEventListener('click', function(e){ abrir(e, 'guia-skills'); });
 document.getElementById('cerrarModal').addEventListener('click', cerrar);
 modal.addEventListener('click', function(e){ if(e.target === modal) cerrar(); });
-document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && modal.classList.contains('abierto')) cerrar(); });
+document.addEventListener('keydown', function(e){
+if(e.key === 'Escape' && modal.classList.contains('abierto')) cerrar();
+});
+modal.addEventListener('keydown', function(e){
+if(e.key !== 'Tab') return;
+var focusable = Array.from(modal.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]):not([tabindex="-1"])')).filter(function(el){ return el.offsetParent !== null; });
+if(!focusable.length) return;
+var first = focusable[0], last = focusable[focusable.length - 1];
+if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+});
 
 function marcar(id, errId, ok){
 var input = document.getElementById(id), err = document.getElementById(errId);
 input.classList.toggle('malo', !ok);
 err.classList.toggle('ver', !ok);
+if(ok) input.removeAttribute('aria-invalid');
+else input.setAttribute('aria-invalid','true');
 return ok;
 }
+function validarCampo(id){
+if(id === 'nombre') return marcar('nombre','errNombre', document.getElementById('nombre').value.trim().length > 1);
+if(id === 'whatsapp'){
+var digits = document.getElementById('whatsapp').value.replace(/\D/g,'');
+return marcar('whatsapp','errWhatsapp', digits.length >= 7 && digits.length <= 15);
+}
+return marcar('correo','errCorreo', /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(document.getElementById('correo').value.trim()));
+}
 function validar(){
-var nombre = document.getElementById('nombre').value.trim(),
-whatsapp = document.getElementById('whatsapp').value.replace(/\D/g,''),
-correo = document.getElementById('correo').value.trim();
-var okNombre = marcar('nombre','errNombre', nombre.length > 1);
-var okWhatsapp = marcar('whatsapp','errWhatsapp', whatsapp.length >= 7 && whatsapp.length <= 15);
-var okCorreo = marcar('correo','errCorreo', /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(correo));
-return okNombre && okWhatsapp && okCorreo;
+return ['nombre','whatsapp','correo'].map(validarCampo).every(function(ok){ return ok; });
 }
 
 document.querySelectorAll('.btn-recurso').forEach(function(btn){
@@ -898,7 +920,7 @@ abrir(e, btn.getAttribute('data-recurso'));
 });
 
 ['nombre','whatsapp','correo'].forEach(function(id){
-document.getElementById(id).addEventListener('blur', validar);
+document.getElementById(id).addEventListener('blur', function(){ validarCampo(id); });
 });
 
 form.addEventListener('submit', function(e){
@@ -918,18 +940,29 @@ recurso: document.getElementById('recurso').value,
 web: document.getElementById('web').value
 })
 })
-.then(function(r){ return r.json().then(function(d){ return {ok:r.ok, d:d}; }); })
+.then(function(r){
+return r.text().then(function(text){
+var data = {};
+if(text){ try { data = JSON.parse(text); } catch(parseError){ data = {}; } }
+return {ok:r.ok, d:data};
+});
+})
 .then(function(res){
 if(res.ok && res.d.ok){
+sentSuccessfully = true;
 document.getElementById('vistaForm').style.display='none';
 document.getElementById('vistaExito').style.display='block';
+modal.setAttribute('aria-labelledby','tituloExito');
+modal.removeAttribute('aria-describedby');
+document.getElementById('tituloExito').focus();
 } else {
-throw new Error(res.d.mensaje || 'No se pudo enviar.');
+throw new Error('No se pudo completar la entrega.');
 }
 })
 .catch(function(err){
+console.error('Error al solicitar el recurso:', err);
 var esGuia = document.getElementById('recurso').value === 'guia-skills';
-errGlob.textContent = err.message + ' Si sigue fallando, escríbeme por WhatsApp y te lo mando yo.';
+errGlob.textContent = 'No pudimos enviar el recurso en este momento. Inténtalo otra vez o escríbeme por WhatsApp y te lo mando yo.';
 errGlob.classList.add('ver');
 btn.disabled = false;
 btn.textContent = esGuia ? 'Enviarme la guía' : 'Enviarme el material';
@@ -947,7 +980,7 @@ console.warn('No se pudo registrar el service worker:', err);
 }
 </script>
 
-<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo">
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitulo" aria-describedby="modalLead" aria-hidden="true">
 <div class="modal-box">
 <button class="cerrar" id="cerrarModal" aria-label="Cerrar">&times;</button>
 <div id="vistaForm">
@@ -956,17 +989,17 @@ console.warn('No se pudo registrar el service worker:', err);
 <form id="formGuia" novalidate>
 <div class="campo">
 <label for="nombre">Nombre</label>
-<input type="text" id="nombre" name="nombre" placeholder="Tu nombre" autocomplete="given-name" required>
+<input type="text" id="nombre" name="nombre" placeholder="Tu nombre" autocomplete="given-name" aria-describedby="errNombre" required>
 <p class="error-campo" id="errNombre">Escribe tu nombre.</p>
 </div>
 <div class="campo">
 <label for="whatsapp">WhatsApp</label>
-<input type="tel" id="whatsapp" name="whatsapp" placeholder="+57 300 000 0000" autocomplete="tel" required>
+<input type="tel" id="whatsapp" name="whatsapp" placeholder="+57 300 000 0000" autocomplete="tel" aria-describedby="errWhatsapp" required>
 <p class="error-campo" id="errWhatsapp">Revisa el número, con indicativo del país.</p>
 </div>
 <div class="campo">
 <label for="correo">Correo</label>
-<input type="email" id="correo" name="correo" placeholder="tu@correo.com" autocomplete="email" required>
+<input type="email" id="correo" name="correo" placeholder="tu@correo.com" autocomplete="email" aria-describedby="errCorreo" required>
 <p class="error-campo" id="errCorreo">Ese correo no tiene un formato válido.</p>
 </div>
 <div class="trampa" aria-hidden="true">
@@ -975,13 +1008,13 @@ console.warn('No se pudo registrar el service worker:', err);
 </div>
 <input type="hidden" id="recurso" name="recurso" value="guia-skills">
 <button type="submit" class="btn-enviar" id="btnEnviar">Enviarme la guía</button>
-<div class="error-global" id="errorGlobal"></div>
-<p class="nota">Tu correo es solo para mandarte la guía y avisarte de las clases. Nada más.</p>
+<div class="error-global" id="errorGlobal" role="alert" aria-live="assertive"></div>
+<p class="nota">Usamos tu correo para entregar el material y tu WhatsApp para ayudarte si la entrega falla. No compartimos tus datos.</p>
 </form>
 </div>
-<div class="exito" id="vistaExito" style="display:none">
+<div class="exito" id="vistaExito" role="status" aria-live="polite" style="display:none">
 <div class="tick">✓</div>
-<h3>Listo, revisa tu correo</h3>
+<h3 id="tituloExito" tabindex="-1">Listo, revisa tu correo</h3>
 <p class="lead">La guía ya va en camino. Si no llega en dos minutos, mírala en spam.</p>
 <a class="cta uf-glow" href="https://chat.whatsapp.com/GaH7I3tUJtiHYAP8nvSEfh" style="margin-top:24px">Entrar a la comunidad</a>
 </div>
